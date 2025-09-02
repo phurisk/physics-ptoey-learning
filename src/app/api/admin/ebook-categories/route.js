@@ -38,7 +38,6 @@ export async function POST(request) {
       data: {
         name: data.name,
         description: data.description,
-        slug: data.slug || data.name.toLowerCase().replace(/\s+/g, '-'),
         isActive: data.isActive !== undefined ? data.isActive : true
       }
     });
