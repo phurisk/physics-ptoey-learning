@@ -49,11 +49,11 @@ export async function GET(req) {
       });
     }
     
-    // ขั้นตอนที่ 2: กรอง orders ที่จ่ายเงินแล้ว
+    // ขั้นตอนที่ 2: กรอง orders ที่ชำระเงินเสร็จสมบูรณ์แล้ว (COMPLETED)
     const paidOrders = allOrders.filter(order => 
-      order.status === 'paid' && 
+      order.status === 'COMPLETED' && 
       order.payment && 
-      order.payment.status === 'paid' &&
+      order.payment.status === 'COMPLETED' &&
       order.course
     );
     
@@ -117,9 +117,9 @@ export async function getUserPaidCourses(req, { params }) {
         orders: {
           some: {
             userId: userId,
-            status: 'paid',
+            status: 'COMPLETED',
             payment: {
-              status: 'paid'
+              status: 'COMPLETED'
             }
           }
         }
@@ -152,9 +152,9 @@ export async function getPaidOrdersByUser(userId) {
     const paidOrders = await prisma.order.findMany({
       where: {
         userId: userId,
-        status: 'paid',
+        status: 'COMPLETED',
         payment: {
-          status: 'paid'
+          status: 'COMPLETED'
         }
       },
       include: {
@@ -211,9 +211,9 @@ export async function hasUserPaidForCourse(userId, courseId) {
       where: {
         userId: userId,
         courseId: courseId,
-        status: 'paid',
+        status: 'COMPLETED',
         payment: {
-          status: 'paid'
+          status: 'COMPLETED'
         }
       },
       include: {
