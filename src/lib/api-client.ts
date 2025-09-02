@@ -6,10 +6,7 @@ export type ApiResponse<T> = {
 }
 
 function getApiBase() {
-  if (typeof window === 'undefined') {
-    const base = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || 'http://localhost:3000'
-    return base.replace(/\/$/, '')
-  }
+
   return ''
 }
 
@@ -93,7 +90,7 @@ export async function getEbooks(params?: {
   if (params?.page) qs.set('page', String(params.page))
   if (params?.limit) qs.set('limit', String(params.limit))
 
-  const res = await fetch(`/api/ebooks${qs.toString() ? `?${qs.toString()}` : ''}`, { cache: 'no-store' })
+  const res = await fetch(`${getApiBase()}/api/ebooks${qs.toString() ? `?${qs.toString()}` : ''}`, { cache: 'no-store' })
   if (!res.ok) throw new Error('Failed to fetch ebooks')
   const json: ApiResponse<PublicEbook[]> = await res.json()
   if (!json.success || !json.data) throw new Error(json.error || 'Failed to fetch ebooks')
@@ -116,7 +113,7 @@ export type PublicCourse = {
 }
 
 export async function getCourses(): Promise<PublicCourse[]> {
-  const res = await fetch('/api/courses', { cache: 'no-store' })
+  const res = await fetch(`${getApiBase()}/api/courses`, { cache: 'no-store' })
   if (!res.ok) throw new Error('Failed to fetch courses')
   const json: ApiResponse<PublicCourse[]> = await res.json()
   if (!json.success || !json.data) throw new Error(json.error || 'Failed to fetch courses')
@@ -124,7 +121,7 @@ export async function getCourses(): Promise<PublicCourse[]> {
 }
 
 export async function getCourse(id: string): Promise<PublicCourse> {
-  const res = await fetch(`/api/courses/${encodeURIComponent(id)}`, { cache: 'no-store' })
+  const res = await fetch(`${getApiBase()}/api/courses/${encodeURIComponent(id)}`, { cache: 'no-store' })
   if (!res.ok) throw new Error('Failed to fetch course')
   const json: ApiResponse<PublicCourse> = await res.json()
   if (!json.success || !json.data) throw new Error(json.error || 'Failed to fetch course')
@@ -158,7 +155,7 @@ export type PublicExamFile = {
 }
 
 export async function getExamCategories(includeExams = false): Promise<PublicExamCategory[]> {
-  const res = await fetch(`/api/exam-categories${includeExams ? '?includeExams=true' : ''}`, { cache: 'no-store' })
+  const res = await fetch(`${getApiBase()}/api/exam-categories${includeExams ? '?includeExams=true' : ''}`, { cache: 'no-store' })
   if (!res.ok) throw new Error('Failed to fetch exam categories')
   const json: ApiResponse<PublicExamCategory[]> = await res.json()
   if (!json.success || !json.data) throw new Error(json.error || 'Failed to fetch exam categories')
@@ -176,7 +173,7 @@ export async function getExams(params?: {
   if (params?.limit) qs.set('limit', String(params.limit))
   if (params?.search) qs.set('search', params.search)
   if (params?.categoryId) qs.set('categoryId', params.categoryId)
-  const res = await fetch(`/api/exams${qs.toString() ? `?${qs.toString()}` : ''}`, { cache: 'no-store' })
+  const res = await fetch(`${getApiBase()}/api/exams${qs.toString() ? `?${qs.toString()}` : ''}`, { cache: 'no-store' })
   if (!res.ok) throw new Error('Failed to fetch exams')
   const json: ApiResponse<PublicExam[]> = await res.json()
   if (!json.success || !json.data) throw new Error(json.error || 'Failed to fetch exams')
@@ -184,7 +181,7 @@ export async function getExams(params?: {
 }
 
 export async function getExamDetail(id: string): Promise<PublicExam & { files: PublicExamFile[] }> {
-  const res = await fetch(`/api/exams/${encodeURIComponent(id)}`, { cache: 'no-store' })
+  const res = await fetch(`${getApiBase()}/api/exams/${encodeURIComponent(id)}`, { cache: 'no-store' })
   if (!res.ok) throw new Error('Failed to fetch exam detail')
   const json: ApiResponse<PublicExam & { files: PublicExamFile[] }> = await res.json()
   if (!json.success || !json.data) throw new Error(json.error || 'Failed to fetch exam detail')
