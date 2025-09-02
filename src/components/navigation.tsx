@@ -106,9 +106,6 @@ export function Navigation() {
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuItem asChild>
-                      <Link href="/dashboard">แดชบอร์ด</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
                       <Link href="/profile">โปรไฟล์</Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
