@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
-import { existsSync } from 'fs';
+import cloudinary from '@/lib/cloudinary';
 
 const prisma = new PrismaClient();
 
@@ -33,7 +31,14 @@ export async function POST(request) {
     }
 
     // ตรวจสอบประเภทไฟล์
-    const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'image/jpeg', 'image/png', 'image/gif'];
+    const allowedTypes = [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'image/jpeg',
+      'image/png',
+      'image/gif'
+    ];
     if (!allowedTypes.includes(file.type)) {
       return NextResponse.json(
         { success: false, error: 'ประเภทไฟล์ไม่ถูกต้อง (รองรับเฉพาะ PDF, Word, รูปภาพ)' },
@@ -50,30 +55,37 @@ export async function POST(request) {
       );
     }
 
-    // สร้างชื่อไฟล์ใหม่
-    const timestamp = Date.now();
-    const originalName = file.name;
-    const extension = originalName.split('.').pop();
-    const newFileName = `${examId}_${timestamp}.${extension}`;
-
-    // สร้างโฟลเดอร์สำหรับเก็บไฟล์
-    const uploadDir = join(process.cwd(), 'public', 'uploads', 'exams');
-    if (!existsSync(uploadDir)) {
-      await mkdir(uploadDir, { recursive: true });
-    }
-
-    // บันทึกไฟล์
-    const filePath = join(uploadDir, newFileName);
+    // อัปโหลดไฟล์ไปที่ Cloudinary แทนการเก็บในไฟล์ระบบ (รองรับ Vercel)
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    await writeFile(filePath, buffer);
 
-    // บันทึกข้อมูลไฟล์ในฐานข้อมูล
+    const isImage = file.type.startsWith('image/');
+    const uploadOptions = {
+      folder: 'e-learning/exams',
+      resource_type: isImage ? 'image' : 'raw',
+      public_id: `${examId}_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
+    };
+
+    const uploadResult = await new Promise((resolve, reject) => {
+      cloudinary.uploader.upload_stream(
+        uploadOptions,
+        (error, result) => {
+          if (error) {
+            console.error('Cloudinary upload error (exam file):', error);
+            reject(error);
+          } else {
+            resolve(result);
+          }
+        }
+      ).end(buffer);
+    });
+
+    // บันทึกข้อมูลไฟล์ในฐานข้อมูล (เก็บเป็น URL จาก Cloudinary)
     const examFile = await prisma.examFile.create({
       data: {
         examId,
-        fileName: originalName,
-        filePath: `/uploads/exams/${newFileName}`,
+        fileName: file.name,
+        filePath: uploadResult.secure_url,
         fileType: file.type,
         fileSize: file.size
       }
