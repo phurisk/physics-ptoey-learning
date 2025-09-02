@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useSession, signOut } from "next-auth/react"
@@ -23,6 +23,8 @@ export function Navigation() {
   const { data: session, status } = useSession()
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
   const pathname = usePathname() 
+  const searchParams = useSearchParams()
+  const router = useRouter()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -36,6 +38,19 @@ export function Navigation() {
     setIsLoginModalOpen(true)
     setIsOpen(false)
   }
+
+  // Open login modal automatically when ?login=1 exists (set by middleware)
+  useEffect(() => {
+    if (!session?.user && searchParams?.get('login') === '1') {
+      setIsLoginModalOpen(true)
+      // clean the query param to avoid stale state
+      const params = new URLSearchParams(searchParams.toString())
+      params.delete('login')
+      const q = params.toString()
+      router.replace(q ? `${pathname}?${q}` : pathname, { scroll: false })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, session?.user])
 
  
   const menuItems = [
@@ -167,7 +182,7 @@ export function Navigation() {
           )}
         </div>
       </nav>
-      <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
+      <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} callbackUrl={searchParams?.get('callbackUrl') || undefined} />
     </>
   )
 }
