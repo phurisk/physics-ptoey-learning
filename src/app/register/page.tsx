@@ -1,12 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { signIn } from "next-auth/react"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 
 export default function RegisterPage() {
   const [name, setName] = useState("")
@@ -16,6 +17,8 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+  const sp = useSearchParams()
+  const callbackUrl = useMemo(() => sp?.get('callbackUrl') || undefined, [sp])
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -35,7 +38,7 @@ export default function RegisterPage() {
       } else {
         setSuccess('สมัครสมาชิกสำเร็จ กำลังเข้าสู่ระบบ...')
         // auto sign in
-        await signIn('credentials', { email, password, callbackUrl: '/' })
+        await signIn('credentials', callbackUrl ? { email, password, callbackUrl } : { email, password, callbackUrl: '/' })
       }
     } catch (e: any) {
       setError('เกิดข้อผิดพลาด กรุณาลองใหม่')
@@ -72,7 +75,7 @@ export default function RegisterPage() {
               {error && <p className="text-sm text-red-600">{error}</p>}
               {success && <p className="text-sm text-green-600">{success}</p>}
               <Button type="submit" disabled={loading} className="w-full cursor-pointer">{loading ? 'กำลังสมัคร...' : 'สมัครสมาชิก'}</Button>
-              <div className="text-sm text-center text-gray-600">มีบัญชีแล้ว? <Link className="underline" href="/login">เข้าสู่ระบบ</Link></div>
+              <div className="text-sm text-center text-gray-600">มีบัญชีแล้ว? <Link className="underline" href={callbackUrl ? `/login?callbackUrl=${encodeURIComponent(callbackUrl)}` : '/login'}>เข้าสู่ระบบ</Link></div>
             </form>
           </CardContent>
         </Card>
@@ -80,4 +83,3 @@ export default function RegisterPage() {
     </div>
   )
 }
-
