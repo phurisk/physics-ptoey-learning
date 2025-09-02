@@ -207,10 +207,10 @@ export default function ExamBankPage() {
                           <span className="text-sm">{f.fileName}</span>
                         </div>
                         <div className="flex gap-2">
-                          <a href={f.filePath} target="_blank" rel="noreferrer">
+                          <a href={(f as any).fileUrl || f.filePath} target="_blank" rel="noreferrer">
                             <Button variant="outline" className="cursor-pointer"><Eye className="h-4 w-4 mr-2" />ดู</Button>
                           </a>
-                          <a href={f.filePath} download>
+                          <a href={(f as any).fileUrl || f.filePath} download>
                             <Button className="cursor-pointer"><Download className="h-4 w-4 mr-2" />ดาวน์โหลด</Button>
                           </a>
                         </div>

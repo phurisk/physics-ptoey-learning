@@ -20,8 +20,10 @@ export async function GET(request) {
 
     // กรองตามประเภทโพสต์ถ้ามี
     if (postTypeName) {
+      const nameQuery = postTypeName.trim();
+      // รองรับชื่อประเภทที่อาจมีช่องว่าง/ตัวพิมพ์เล็กใหญ่ต่างกัน
       whereCondition.postType = {
-        name: postTypeName,
+        name: { contains: nameQuery, mode: "insensitive" },
         isActive: true,
       };
     } else {

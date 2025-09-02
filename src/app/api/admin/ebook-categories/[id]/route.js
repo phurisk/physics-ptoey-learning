@@ -9,7 +9,7 @@ export async function GET(request, { params }) {
     const { id } = params;
     
     const category = await prisma.ebookCategory.findUnique({
-      where: { id: parseInt(id) },
+      where: { id },
       include: {
         ebooks: {
           select: {
@@ -52,13 +52,11 @@ export async function PUT(request, { params }) {
     const data = await request.json();
     
     const category = await prisma.ebookCategory.update({
-      where: { id: parseInt(id) },
+      where: { id },
       data: {
         name: data.name,
         description: data.description,
-        slug: data.slug,
-        isActive: data.isActive,
-        updatedAt: new Date()
+        isActive: data.isActive
       }
     });
 
@@ -79,7 +77,7 @@ export async function DELETE(request, { params }) {
     
     // ตรวจสอบว่ามี ebooks ที่เชื่อมโยงอยู่หรือไม่
     const ebookCount = await prisma.ebook.count({
-      where: { categoryId: parseInt(id) }
+      where: { categoryId: id }
     });
 
     if (ebookCount > 0) {
@@ -90,7 +88,7 @@ export async function DELETE(request, { params }) {
     }
 
     await prisma.ebookCategory.delete({
-      where: { id: parseInt(id) }
+      where: { id }
     });
 
     return NextResponse.json({ message: 'Category deleted successfully' });

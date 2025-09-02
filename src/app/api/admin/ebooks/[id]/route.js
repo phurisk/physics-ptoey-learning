@@ -9,7 +9,7 @@ export async function GET(request, { params }) {
     const { id } = params;
     
     const ebook = await prisma.ebook.findUnique({
-      where: { id: parseInt(id) },
+      where: { id },
       include: {
         category: true,
         reviews: {
@@ -66,7 +66,7 @@ export async function PUT(request, { params }) {
     const data = await request.json();
     
     const ebook = await prisma.ebook.update({
-      where: { id: parseInt(id) },
+      where: { id },
       data: {
         title: data.title,
         description: data.description,
@@ -88,8 +88,7 @@ export async function PUT(request, { params }) {
         isActive: data.isActive,
         isFeatured: data.isFeatured,
         categoryId: data.categoryId || null,
-        publishedAt: data.publishedAt ? new Date(data.publishedAt) : null,
-        updatedAt: new Date()
+        publishedAt: data.publishedAt ? new Date(data.publishedAt) : null
       },
       include: {
         category: true
@@ -114,8 +113,7 @@ export async function DELETE(request, { params }) {
     // ตรวจสอบว่ามี orders ที่เชื่อมโยงอยู่หรือไม่
     const orderCount = await prisma.order.count({
       where: {
-        orderableType: 'EBOOK',
-        orderableId: parseInt(id)
+        ebookId: id
       }
     });
 
@@ -128,12 +126,12 @@ export async function DELETE(request, { params }) {
 
     // ลบ reviews ก่อน
     await prisma.ebookReview.deleteMany({
-      where: { ebookId: parseInt(id) }
+      where: { ebookId: id }
     });
 
     // ลบ ebook
     await prisma.ebook.delete({
-      where: { id: parseInt(id) }
+      where: { id }
     });
 
     return NextResponse.json({ message: 'Ebook deleted successfully' });
