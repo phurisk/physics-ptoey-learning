@@ -41,9 +41,19 @@ export async function GET(request, { params }) {
       );
     }
 
+    // Ensure file URLs are absolute for both local and production
+    const origin = new URL(request.url).origin;
+    const withAbsoluteFiles = {
+      ...exam,
+      files: (exam.files || []).map((f) => ({
+        ...f,
+        fileUrl: f.filePath?.startsWith('http') ? f.filePath : `${origin}${f.filePath}`
+      }))
+    };
+
     return NextResponse.json({
       success: true,
-      data: exam
+      data: withAbsoluteFiles
     });
 
   } catch (error) {

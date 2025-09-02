@@ -124,21 +124,7 @@ export default function EbookCategoriesPage() {
     });
   };
 
-  const generateSlug = (name) => {
-    return name
-      .toLowerCase()
-      .replace(/[^\w\s-]/g, "")
-      .replace(/\s+/g, "-")
-      .trim();
-  };
-
-  const handleNameChange = (e) => {
-    const name = e.target.value;
-    form.setFieldsValue({
-      name,
-      slug: generateSlug(name),
-    });
-  };
+  // slug is not used for EbookCategory, so no slug helpers
 
   const formatDate = (dateString) => {
     return dateString ? new Date(dateString).toLocaleString("th-TH") : "-";
@@ -175,20 +161,7 @@ export default function EbookCategoriesPage() {
       ),
       width: 300,
     },
-    {
-      title: "Slug",
-      dataIndex: "slug",
-      key: "slug",
-      render: (slug) => (
-        <Space size={8}>
-          <LinkOutlined style={{ color: "#8c8c8c" }} />
-          <Text code style={{ fontSize: "12px" }}>
-            {slug}
-          </Text>
-        </Space>
-      ),
-      width: 200,
-    },
+    // slug column removed (not used)
     {
       title: "จำนวน eBook",
       key: "ebookCount",
@@ -372,29 +345,10 @@ export default function EbookCategoriesPage() {
           >
             <Input
               placeholder="ใส่ชื่อหมวดหมู่"
-              onChange={handleNameChange}
               style={{ borderRadius: "6px" }}
             />
           </Form.Item>
-
-          <Form.Item
-            name="slug"
-            label={
-              <Space size={6}>
-                <LinkOutlined style={{ color: "#8c8c8c" }} />
-                <Text>Slug</Text>
-              </Space>
-            }
-            rules={[
-              { required: true, message: "กรุณากรอก Slug" },
-              {
-                pattern: /^[a-z0-9-]+$/,
-                message: "Slug ต้องเป็นตัวอักษรเล็ก ตัวเลข และ - เท่านั้น",
-              },
-            ]}
-          >
-            <Input placeholder="slug-name" style={{ borderRadius: "6px" }} />
-          </Form.Item>
+          {/* slug input removed */}
 
           <Form.Item
             name="description"

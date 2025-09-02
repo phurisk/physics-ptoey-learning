@@ -176,6 +176,36 @@ export function Navigation() {
                       ออกจากระบบ
                     </Button>
                   </div>
+                  )}
+
+                {session?.user && (
+                  <>
+                    {(session.user as any).role === 'ADMIN' && (
+                      <Link
+                        href="/admin"
+                        onClick={() => setIsOpen(false)}
+                        className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 ${
+                          pathname === '/admin'
+                            ? 'text-[#004B7D] border-l-4 border-[#004B7D] bg-[#004B7D1A]'
+                            : 'text-gray-700 hover:text-[#004B7D] hover:bg-[#004B7D1A]'
+                        }`}
+                      >
+                        แผงควบคุมผู้ดูแล
+                      </Link>
+                    )}
+
+                    <Link
+                      href="/profile"
+                      onClick={() => setIsOpen(false)}
+                      className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 ${
+                        pathname === '/profile'
+                          ? 'text-[#004B7D] border-l-4 border-[#004B7D] bg-[#004B7D1A]'
+                          : 'text-gray-700 hover:text-[#004B7D] hover:bg-[#004B7D1A]'
+                      }`}
+                    >
+                      โปรไฟล์
+                    </Link>
+                  </>
                 )}
               </div>
             </div>

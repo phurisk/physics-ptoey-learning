@@ -1,35 +1,42 @@
 "use client"
 
-import { useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { MotionConfig, motion } from "framer-motion"
 import Image from "next/image"
 import Link from "next/link"
 import { Navigation } from "@/components/navigation"
 import { Suspense } from "react"
 import { Footer } from "@/components/sections/footer"
+import { getPosts, type PublicPost } from "@/lib/api-client"
 
 
-const studyPlans = [
-  {
-    id: 1,
-    image: "/student-plan1.jpeg",
-  },
-  {
-    id: 2,
-    image: "/student-plan2.jpeg",
-  },
-  {
-    id: 3,
-    image: "/student-plan3.jpeg",
-  },
-  {
-    id: 4,
-    image: "/student-plan4.jpeg",
-  },
-]
+type PlanItem = { id: string; image: string }
 
 
 export default function StudentWorksPage() {
+  const [items, setItems] = useState<PlanItem[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    let mounted = true
+    ;(async () => {
+      try {
+        const posts: PublicPost[] = await getPosts({ postType: "แผนการเรียน" })
+        if (!mounted) return
+        const mapped: PlanItem[] = posts
+          .map((p) => ({ id: p.id, image: p.imageUrl || p.imageUrlMobileMode || "" }))
+          .filter((p) => !!p.image)
+        setItems(mapped)
+      } catch (e) {
+        console.error(e)
+      } finally {
+        if (mounted) setLoading(false)
+      }
+    })()
+    return () => {
+      mounted = false
+    }
+  }, [])
   return (
     <MotionConfig transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}>
       <Suspense fallback={null}>
@@ -64,7 +71,15 @@ export default function StudentWorksPage() {
 
 
           <div className="relative mx-auto max-w-7xl px-4 py-12 sm:py-16">
-            <ElegantStack items={studyPlans} />
+            {loading ? (
+              <div className="mx-auto max-w-3xl space-y-8 sm:space-y-10">
+                <div className="h-80 bg-gray-100 animate-pulse rounded-2xl" />
+                <div className="h-80 bg-gray-100 animate-pulse rounded-2xl" />
+                <div className="h-80 bg-gray-100 animate-pulse rounded-2xl" />
+              </div>
+            ) : (
+              <ElegantStack items={items} />
+            )}
           </div>
         </section>
 
@@ -96,7 +111,7 @@ export default function StudentWorksPage() {
 }
 
 
-function ElegantStack({ items }: { items: typeof studyPlans }) {
+function ElegantStack({ items }: { items: PlanItem[] }) {
   const layout = useMemo(() => items, [items])
 
   return (
@@ -124,7 +139,7 @@ function ElegantTile({
   work,
   index,
 }: {
-  work: { id: number; image: string }
+  work: PlanItem
   index: number
 }) {
   const variants = useMemo(
