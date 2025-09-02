@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { getCourse, type PublicCourse } from "@/lib/api-client"
+import { useRouter } from "next/navigation"
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
@@ -21,6 +22,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
   const { id } = use(params)
   const [course, setCourse] = useState<PublicCourse | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const router = useRouter()
 
   useEffect(() => {
     getCourse(id)
@@ -165,8 +167,11 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
 
 
                   <div className="space-y-3">
-                    <Button className="w-full bg-yellow-400 hover:bg-yellow-500 text-white text-lg py-3">
-                      สมัครเรียนเลย
+                    <Button
+                      className="w-full bg-yellow-400 hover:bg-yellow-500 text-white text-lg py-3"
+                      onClick={() => course?.id && router.push(`/checkout?itemType=course&itemId=${encodeURIComponent(course.id)}`)}
+                    >
+                      {course?.isFree ? 'สมัครเรียนฟรี' : 'สมัครเรียนเลย'}
                     </Button>
                     <Button variant="outline" className="w-full bg-transparent">
                       เพิ่มในรายการโปรด

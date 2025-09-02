@@ -7,8 +7,10 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { getEbooks, type PublicEbook } from "@/lib/api-client"
+import { useRouter } from "next/navigation"
 
 export default function Books() {
+  const router = useRouter()
   const [ebooks, setEbooks] = useState<PublicEbook[] | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -151,6 +153,9 @@ export default function Books() {
                       w-full bg-yellow-400 hover:bg-yellow-500 text-white font-medium
                       py-2 md:py-3 text-sm md:text-base  /* MOBILE-ONLY: ปุ่มเตี้ยลง + ฟอนต์เล็กลง */
                     "
+                    onClick={() => {
+                      router.push(`/checkout?itemType=ebook&itemId=${encodeURIComponent(book.id)}`)
+                    }}
                   >
                     <ShoppingCart className="w-4 h-4 mr-2" />
                     สั่งซื้อเลย

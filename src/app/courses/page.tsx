@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge"
 // derive categories from API items
 import { Footer } from "@/components/sections/footer"
 import { getCourses, type PublicCourse } from "@/lib/api-client"
+import { useRouter } from "next/navigation"
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
@@ -27,6 +28,7 @@ const staggerContainer = {
 }
 
 export default function CoursesPage() {
+  const router = useRouter()
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [items, setItems] = useState<PublicCourse[] | null>(null)
   const [categories, setCategories] = useState<Array<{ id: string; name: string }>>([{ id: 'all', name: 'คอร์สทั้งหมด' }])
@@ -164,9 +166,18 @@ export default function CoursesPage() {
 
                    
                       {course?.id && (
-                        <Link href={`/courses/${course.id}`}>
-                        <Button className="w-full bg-yellow-400 hover:bg-yellow-500 text-white">ดูรายละเอียด</Button>
-                        </Link>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          <Link href={`/courses/${course.id}`}>
+                            <Button className="w-full bg-yellow-400 hover:bg-yellow-500 text-white">ดูรายละเอียด</Button>
+                          </Link>
+                          <Button
+                            variant="outline"
+                            className="w-full"
+                            onClick={() => router.push(`/checkout?itemType=course&itemId=${encodeURIComponent(course.id)}`)}
+                          >
+                            {course?.isFree ? 'สมัครเรียนฟรี' : 'ซื้อคอร์ส'}
+                          </Button>
+                        </div>
                       )}
                     </div>
                   </CardContent>
