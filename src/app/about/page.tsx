@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion"
 import { Navigation } from "@/components/navigation"
+import { Suspense } from "react"
 import { Footer } from "@/components/sections/footer"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -85,7 +86,9 @@ export default function AboutPage() {
 
   return (
     <>
-      <Navigation />
+      <Suspense fallback={null}>
+        <Navigation />
+      </Suspense>
 
       <main className="min-h-screen bg-gradient-to-br from-yellow-50 to-white">
 
