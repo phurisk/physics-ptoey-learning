@@ -13,9 +13,10 @@ import { Label } from "@/components/ui/label"
 interface LoginModalProps {
   isOpen: boolean
   onClose: () => void
+  callbackUrl?: string
 }
 
-export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
+export default function LoginModal({ isOpen, onClose, callbackUrl }: LoginModalProps) {
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login')
   const [loading, setLoading] = useState<"line" | "credentials" | "register" | null>(null)
   const [email, setEmail] = useState("")
@@ -29,7 +30,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     try {
       setLoading("line")
       setError(null)
-      await signIn('line')
+      await signIn('line', callbackUrl ? { callbackUrl } : undefined)
     } finally {
       setLoading(null)
     }
@@ -40,7 +41,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     try {
       setLoading("credentials")
       setError(null)
-      const res = await signIn('credentials', { redirect: false, email, password })
+      const res = await signIn('credentials', callbackUrl ? { redirect: true, email, password, callbackUrl } : { redirect: false, email, password })
       if (res?.error) {
         setError("อีเมลหรือรหัสผ่านไม่ถูกต้อง")
       } else {
@@ -65,7 +66,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       if (!res.ok || !json.success) {
         setError(json.error || 'สมัครสมาชิกไม่สำเร็จ')
       } else {
-        await signIn('credentials', { email, password })
+        await signIn('credentials', callbackUrl ? { email, password, callbackUrl } : { email, password })
         onClose()
       }
     } finally {

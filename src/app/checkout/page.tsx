@@ -91,7 +91,11 @@ export default function CheckoutStartPage() {
   }
 
   const proceed = async () => {
-    if (!session?.user?.id) { router.push('/login'); return }
+    if (!session?.user?.id) {
+      const current = typeof window !== 'undefined' ? window.location.href : undefined
+      router.push(current ? `/login?callbackUrl=${encodeURIComponent(current)}&msg=login_required` : '/login?msg=login_required')
+      return
+    }
     try {
       const data = await createOrder({
         userId: session.user.id as string,
