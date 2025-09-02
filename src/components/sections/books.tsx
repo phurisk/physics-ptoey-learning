@@ -119,7 +119,7 @@ export default function Books() {
                   </h3>
 
                 
-                  <p className="hidden md:block text-gray-600 mb-4 text-pretty leading-relaxed">
+                  <p className="hidden md:block text-gray-600 mb-4 text-pretty leading-relaxed line-clamp-2">
                     {book.description}
                   </p>
 

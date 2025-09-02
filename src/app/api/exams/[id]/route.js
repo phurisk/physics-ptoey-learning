@@ -8,8 +8,9 @@ export async function GET(request, { params }) {
   try {
     const { id } = await params;
     
-    const exam = await prisma.examBank.findUnique({
-      where: { 
+    // Use findFirst to allow filtering by non-unique fields (isActive)
+    const exam = await prisma.examBank.findFirst({
+      where: {
         id,
         isActive: true
       },
