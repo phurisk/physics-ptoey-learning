@@ -5,6 +5,7 @@ import { MotionConfig, motion } from "framer-motion"
 import Image from "next/image"
 import Link from "next/link"
 import { Navigation } from "@/components/navigation"
+import { Suspense } from "react"
 import { Footer } from "@/components/sections/footer"
 
 
@@ -31,7 +32,9 @@ const studyPlans = [
 export default function StudentWorksPage() {
   return (
     <MotionConfig transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}>
-      <Navigation />
+      <Suspense fallback={null}>
+        <Navigation />
+      </Suspense>
       <main className="min-h-screen bg-white">
 
 

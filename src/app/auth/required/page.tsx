@@ -1,10 +1,10 @@
 "use client"
 
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Navigation } from '@/components/navigation'
 
-export default function RequireLoginPage() {
+function RequireLoginContent() {
   const sp = useSearchParams()
   const router = useRouter()
 
@@ -28,3 +28,10 @@ export default function RequireLoginPage() {
   )
 }
 
+export default function RequireLoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <RequireLoginContent />
+    </Suspense>
+  )
+}
