@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import {
-  verifySlipWithEasySlip,
+  verifySlipWithSlipOK,
   parseSlipResult,
   validateSlipData,
 } from "@/lib/easyslip";
@@ -211,17 +211,27 @@ export async function POST(request) {
 
     console.log("Re-analyzing slip for payment:", payment.id);
 
-    // Verify slip with EasySlip
+    // Verify slip with SlipOK by downloading the slip image first
     let slipVerification = null;
     let slipValidation = null;
 
     try {
-      console.log("Starting EasySlip verification...");
-      const easySlipResult = await verifySlipWithEasySlip(payment.slipUrl);
-      slipVerification = parseSlipResult(easySlipResult);
+      console.log("Downloading slip for verification:", payment.slipUrl);
+      const resp = await fetch(payment.slipUrl);
+      if (!resp.ok) {
+        throw new Error(`โหลดสลิปล้มเหลว (${resp.status})`);
+      }
+      const arrayBuf = await resp.arrayBuffer();
+      const buf = Buffer.from(arrayBuf);
+      const mime = resp.headers.get('content-type') || 'image/jpeg';
+      const fileName = payment.slipUrl.split('/').pop() || `slip-${payment.id}.jpg`;
+
+      console.log("Starting SlipOK verification with downloaded image...");
+      const slipOkResult = await verifySlipWithSlipOK(buf, fileName, mime);
+      slipVerification = parseSlipResult(slipOkResult);
 
       if (slipVerification.success) {
-        console.log("EasySlip verification successful");
+        console.log("Slip verification successful");
         // Validate against order data
         slipValidation = validateSlipData(slipVerification.data, {
           total: payment.order.total,
@@ -229,11 +239,11 @@ export async function POST(request) {
           bankAccount: "123-4-56789-0", // Your bank account number
         });
       }
-    } catch (easySlipError) {
-      console.error("EasySlip verification error:", easySlipError);
+    } catch (verifyError) {
+      console.error("Slip verification error:", verifyError);
       slipVerification = {
         success: false,
-        error: "ไม่สามารถตรวจสอบสลิปอัตโนมัติได้: " + easySlipError.message,
+        error: "ไม่สามารถตรวจสอบสลิปอัตโนมัติได้: " + verifyError.message,
         data: null,
       };
     }

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from 'react'
+import { Suspense, useEffect, useMemo, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
@@ -8,7 +8,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { createOrder } from '@/lib/orders'
 
-export default function CheckoutStartPage() {
+function CheckoutStartContent() {
   const router = useRouter()
   const params = useSearchParams()
   const { data: session, status } = useSession()
@@ -139,5 +139,13 @@ export default function CheckoutStartPage() {
         </Card>
       </div>
     </div>
+  )
+}
+
+export default function CheckoutStartPage() {
+  return (
+    <Suspense fallback={null}>
+      <CheckoutStartContent />
+    </Suspense>
   )
 }

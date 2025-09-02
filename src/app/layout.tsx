@@ -1,4 +1,5 @@
 import type React from "react"
+import { Suspense } from "react"
 import type { Metadata } from "next"
 import { GeistMono } from "geist/font/mono"
 import { Sarabun } from "next/font/google"
@@ -32,7 +33,9 @@ export default function RootLayout({
     <html lang="th">
       <body className={`font-sans ${sarabun.variable} ${GeistMono.variable} antialiased`}>
         <AppSessionProvider>
-          <Navigation />
+          <Suspense fallback={null}>
+            <Navigation />
+          </Suspense>
           <main className="pt-16 lg:pt-20">{children}</main>
         </AppSessionProvider>
       </body>
